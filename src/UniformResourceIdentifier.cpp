@@ -35,4 +35,48 @@ URI::URI(const URI &other) {
 	// TODO Auto-generated constructor stub
 
 }
+URI::URI (const std::string &)
+{
+
+}
+const std::string &URI::scheme ()
+{
+  return <#initializer#>;
+}
+const std::string &URI::userinfo ()
+{
+  return <#initializer#>;
+}
+const std::string &URI::host ()
+{
+  return <#initializer#>;
+}
+const std::string &URI::port ()
+{
+  return <#initializer#>;
+}
+const std::string &URI::path ()
+{
+  return <#initializer#>;
+}
+const std::string &URI::query ()
+{
+  return <#initializer#>;
+}
+const std::string &URI::fragment ()
+{
+  return <#initializer#>;
+}
+std::string &URI::base ()
+{
+  return <#initializer#>;
+}
+std::string &URI::absolute ()
+{
+  return <#initializer#>;
+}
+std::string &URI::relative (std::string &)
+{
+  return <#initializer#>;
+}
 
