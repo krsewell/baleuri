@@ -1,0 +1,8 @@
+//
+// Created by kris on 2021-05-21.
+//
+
+#ifndef BALEURI_INCLUDE_URIPATH_H_
+#define BALEURI_INCLUDE_URIPATH_H_
+
+#endif //BALEURI_INCLUDE_URIPATH_H_

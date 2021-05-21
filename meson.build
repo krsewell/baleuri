@@ -1,6 +1,7 @@
 project('baleuri', 'cpp',
   version: '0.1.0',
-  license: 'MIT')
+  license: 'MIT',
+  default_options : ['c_std=c11', 'cpp_std=gnu++20'])
 
 includes = include_directories('include')
 
@@ -8,6 +9,3 @@ subdir('include')
 subdir('src')
 subdir('test')
 
-
-test_uri_absolute = executable('test_uri_absolute', 'test/uri_absolute_test.cpp')
-test('uri_absolute', test_uri_absolute)
