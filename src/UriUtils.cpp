@@ -4,8 +4,7 @@
 
 #include "../include/UriUtils.h"
 
-namespace bale {
-namespace uri {
+namespace bale::uri {
 bool isUnreserved(const char c) {
   return std::isalnum(c) || c == '-' || c == '.' || c == '_' || c == '~';
 }
@@ -101,6 +100,5 @@ char percentEncoded_toChar(std::string_view &str) {
 std::string char_toPercentEncoded(const char c) {
   auto value = short_toHexPair((short) c);
   return std::string{'%', (char) value[0], (char) value[1]};
-}
 }
 }
