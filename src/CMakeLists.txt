@@ -1,4 +1,4 @@
-add_library(baleuri SHARED UriUtils.cpp)
+add_library(baleuri SHARED UriUtils.cpp Uri.cpp)
 add_library(bale::uri ALIAS baleuri)
 
 target_compile_features(baleuri PRIVATE )

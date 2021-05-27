@@ -2,7 +2,7 @@
 // Created by kris on 2021-05-21.
 //
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc,argv);
