@@ -8,30 +8,43 @@
 #include <string>
 #include <string_view>
 #include <stdexcept>
+#include <boost/spirit/home/x3.hpp>
+
+namespace x3 = boost::spirit::x3;
 
 namespace bale {
 namespace uri {
 
-bool isUnreserved(const char c);
+typedef std::string::const_iterator sv_iterator;
 
-bool isGenDelimiter(const char c);
+template<typename T>
+bool parse(const std::string_view, T);
 
-bool isSubDelimiter(const char c);
+bool isUnreserved(const std::string_view);
 
-bool isReserved(const char c);
+bool isGenDelimiter(const std::string_view);
 
-bool isHex(const char c);
+bool isSubDelimiter(const std::string_view);
 
+bool isReserved(const std::string_view);
+
+bool isHex(const std::string_view);
+
+bool percentDecoder(sv_iterator start, sv_iterator end, char &c);
+[[unimplemented]]
+bool percentEncoder(sv_iterator chara, std::string_view &str);
+
+[[deprecated("Marked for deletion")]]
 short toShort(const char c);
-
+[[deprecated("Marked for deletion")]]
 char toChar(short value);
-
+[[deprecated("Marked for deletion")]]
 short hexPair_toShort(const char msd, const char lsd);
-
+[[deprecated("Marked for deletion")]]
 std::string short_toHexPair(const short in);
-
+[[deprecated("Marked for deletion")]]
 char percentEncoded_toChar(std::string_view &str);
-
+[[deprecated("Marked for deletion")]]
 std::string char_toPercentEncoded(const char c);
 
 }

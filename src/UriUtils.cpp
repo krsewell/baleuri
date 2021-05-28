@@ -2,29 +2,69 @@
 // Created by kris on 2021-05-21.
 //
 
-#include "../include/UriUtils.h"
+#include "UriUtils.h"
 
 namespace bale::uri {
-bool isUnreserved(const char c) {
-  return std::isalnum(c) || c == '-' || c == '.' || c == '_' || c == '~';
+
+auto zero = [](auto &ctx) { _val(ctx) = 0; };
+auto hex_a = [](auto &ctx) { _val(ctx) += _attr(ctx); };
+
+x3::rule<class unreserved> const unreserved = "unreserved";
+auto const unreserved_def = x3::alnum | x3::char_('-') | x3::char_('.') | x3::char_('_') | x3::char_('~');
+
+x3::rule<class generaldelimiter> const generaldelimiter = "generaldelimiter";
+auto const generaldelimiter_def = x3::char_(':') | x3::char_('/') | x3::char_('?') | x3::char_('#') |
+    x3::char_('[') | x3::char_(']') | x3::char_('@');
+
+x3::rule<class subdelimiter> const subdelimiter = "subdelimiter";
+const auto subdelimiter_def = x3::char_('!') | x3::char_('$') | x3::char_('&') | x3::char_('\'') |
+    x3::char_('(') | x3::char_(')') | x3::char_('*') | x3::char_('+') |
+    x3::char_(',') | x3::char_(';') | x3::char_('=');
+
+x3::rule<class reserved> const reserved = "reserved";
+const auto reserved_def = generaldelimiter | subdelimiter;
+
+x3::rule<class hex> const hex = "hex";
+const auto hex_def = x3::digit | x3::char_('a', 'f') | x3::char_('A', 'F');
+
+x3::rule<class percentencoded, int> percentencoded = "percentencoded";
+const auto percentencoded_def = x3::char_('%')[zero] >> x3::hex[hex_a];
+
+BOOST_SPIRIT_DEFINE(unreserved, generaldelimiter, subdelimiter, reserved, hex, percentencoded);
+
+template<typename T>
+bool parse(const std::string_view s, T x3parser) {
+  auto start = s.begin();
+  return x3::parse(start, s.end(), x3parser);
 }
 
-bool isGenDelimiter(const char c) {
-  return c == ':' || c == '/' || c == '?' || c == '#' || c == '[' || c == ']' || c == '@';
+bool isUnreserved(const std::string_view s) {
+  return parse(s, unreserved);
 }
 
-bool isSubDelimiter(const char c) {
-  return c == '!' || c == '$' || c == '&' || c == '\'' || c == '(' || c == ')' || c == '*' ||
-      c == '+' || c == ',' || c == ';' || c == '=';
+bool isGenDelimiter(const std::string_view s) {
+  return parse(s, generaldelimiter);
 }
 
-bool isReserved(const char c) {
-  return isGenDelimiter(c) || isSubDelimiter(c);
+bool isSubDelimiter(const std::string_view s) {
+  return parse(s, subdelimiter);
 }
 
-bool isHex(const char c) {
-  return (std::isdigit(c) || c == 'a' || c == 'b' || c == 'c' || c == 'd' || c == 'e' || c == 'f'
-      || c == 'A' || c == 'B' || c == 'C' || c == 'D' || c == 'E' || c == 'F');
+bool isReserved(const std::string_view s) {
+  return parse(s, reserved);
+}
+
+bool isHex(const std::string_view s) {
+  return parse(s, hex);
+}
+
+bool percentDecoder(sv_iterator start, sv_iterator end, char &c) {
+  auto b = x3::parse(start, end, percentencoded, c);
+  return (b && start == end);
+}
+
+bool percentEncoder(sv_iterator chara, std::string_view &str) {
+  return false;
 }
 
 short toShort(const char c) {
@@ -51,7 +91,7 @@ short toShort(const char c) {
     case 'e': return 14;
     case 'F':
     case 'f': return 15;
-    default:throw std::invalid_argument("passed a non-hex char to toShort");
+    default:throw std::invalid_argument("passed a non-hex_ char to toShort");
   }
 }
 
@@ -73,7 +113,7 @@ char toChar(short value) {
     case 13: return 'd';
     case 14: return 'e';
     case 15: return 'f';
-    default:throw std::invalid_argument("passed a non-hex short to toChar");
+    default:throw std::invalid_argument("passed a non-hex_ short to toChar");
   }
 }
 
@@ -89,16 +129,4 @@ std::string short_toHexPair(const short in) {
   return std::string{msd, lsd, '\0'};
 }
 
-char percentEncoded_toChar(std::string_view &str) {
-  if (str.size() < 3 || str[0] != '%' || !isHex(str[1]) || !isHex(str[2])) {
-    throw std::invalid_argument("passed an invalid percent encoded string");
-  }
-  auto value = hexPair_toShort(str[1], str[2]);
-  return (char) value;
-}
-
-std::string char_toPercentEncoded(const char c) {
-  auto value = short_toHexPair((short) c);
-  return std::string{'%', (char) value[0], (char) value[1]};
-}
 }
